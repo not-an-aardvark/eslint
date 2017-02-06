@@ -1,10 +1,8 @@
-# Disallow return before else (no-else-return)
-
-This rule was **deprecated** in ESLint v3.3.0 and replaced by the [no-useless-else](no-useless-else.md) rule.
-
-If an `if` block contains a `return` statement, the `else` block becomes unnecessary. Its contents can be placed outside of the block.
+# disallow `else` blocks with no effect (no-useless-else)
 
 (fixable) The `--fix` option on the [command line](../user-guide/command-line-interface#fix) automatically fixes problems reported by this rule.
+
+If an `if` block contains a control flow statement such as `return`, the `else` block becomes unnecessary. Its contents can be placed outside of the block.
 
 ```js
 function foo() {
@@ -18,12 +16,12 @@ function foo() {
 
 ## Rule Details
 
-This rule is aimed at highlighting an unnecessary block of code following an `if` containing a return statement. As such, it will warn when it encounters an `else` following a chain of `if`s, all of them containing a `return` statement.
+This rule is aimed at highlighting an unnecessary block of code following an `if` containing a control flow statement. As such, it will warn when it encounters an `else` following a chain of `if`s, all of them containing a `return`, `throw`, `break`, or `continue` statement.
 
 Examples of **incorrect** code for this rule:
 
 ```js
-/*eslint no-else-return: "error"*/
+/*eslint no-useless-else: "error"*/
 
 function foo() {
     if (x) {
@@ -65,12 +63,28 @@ function foo() {
         return z;
     }
 }
+
+function foo() {
+    if (x) {
+        throw new Error();
+    } else {
+        return z;
+    }
+}
+
+for (let foo = 1; foo < 10; foo++) {
+    if (foo % 3) {
+        continue;
+    } else {
+        console.log('Fizz');
+    }
+}
 ```
 
 Examples of **correct** code for this rule:
 
 ```js
-/*eslint no-else-return: "error"*/
+/*eslint no-useless-else: "error"*/
 
 function foo() {
     if (x) {
@@ -98,5 +112,19 @@ function foo() {
     } else {
         return z;
     }
+}
+
+function foo() {
+    if (x) {
+        throw new Error();
+    }
+    return z;
+}
+
+for (let foo = 1; foo < 10; foo++) {
+    if (foo % 3) {
+        continue;
+    }
+    console.log('Fizz');
 }
 ```
