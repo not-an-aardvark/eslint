@@ -243,6 +243,7 @@ ruleTester.run("one-var", rule, {
     invalid: [
         {
             code: "function foo() { var bar = true, baz = false; }",
+            output: "function foo() { var bar = true; var baz = false; }",
             options: ["never"],
             errors: [{
                 message: "Split 'var' declarations into multiple statements.",
@@ -251,6 +252,7 @@ ruleTester.run("one-var", rule, {
         },
         {
             code: "function foo() { var bar = true; var baz = false; }",
+            output: "function foo() { var bar = true, baz = false; }",
             options: ["always"],
             errors: [{
                 message: "Combine this with the previous 'var' statement.",
@@ -259,6 +261,7 @@ ruleTester.run("one-var", rule, {
         },
         {
             code: "var a = 1; for (var b = 2;;) {}",
+            output: null,
             options: ["always"],
             errors: [{
                 message: "Combine this with the previous 'var' statement.",
@@ -267,6 +270,7 @@ ruleTester.run("one-var", rule, {
         },
         {
             code: "function foo() { var foo = true, bar = false; }",
+            output: "function foo() { var foo = true; var bar = false; }",
             options: [{ initialized: "never" }],
             errors: [
                 {
@@ -277,6 +281,7 @@ ruleTester.run("one-var", rule, {
         },
         {
             code: "function foo() { var foo, bar; }",
+            output: "function foo() { var foo; var bar; }",
             options: [{ uninitialized: "never" }],
             errors: [
                 {
@@ -287,6 +292,7 @@ ruleTester.run("one-var", rule, {
         },
         {
             code: "function foo() { var bar, baz; var a = true; var b = false; var c, d;}",
+            output: "function foo() { var bar, baz, a = true, b = false, c, d; }",
             options: [{ uninitialized: "always", initialized: "never" }],
             errors: [
                 {
@@ -297,6 +303,7 @@ ruleTester.run("one-var", rule, {
         },
         {
             code: "function foo() { var bar = true, baz = false; var a; var b; var c = true, d = false; }",
+            output: "function foo() { var bar = true, baz = false, a, b, c = true, d = false; }",
             options: [{ uninitialized: "never", initialized: "always" }],
             errors: [
                 {
@@ -307,6 +314,7 @@ ruleTester.run("one-var", rule, {
         },
         {
             code: "function foo() { var bar = true, baz = false; var a, b;}",
+            output: "function foo() { var bar = true; var baz = false; var a; var b;}",
             options: [{ uninitialized: "never", initialized: "never" }],
             errors: [
                 {
@@ -321,6 +329,7 @@ ruleTester.run("one-var", rule, {
         },
         {
             code: "function foo() { var bar = true; var baz = false; var a; var b;}",
+            output: "function foo() { var bar = true, baz = false, a, b;}",
             options: [{ uninitialized: "always", initialized: "always" }],
             errors: [
                 {
@@ -339,6 +348,7 @@ ruleTester.run("one-var", rule, {
         },
         {
             code: "function foo() { var a = [1, 2, 3]; var [b, c, d] = a; }",
+            output: "function foo() { var a = [1, 2, 3], [b, c, d] = a; }",
             parserOptions: { ecmaVersion: 6 },
             options: ["always"],
             errors: [{
@@ -348,6 +358,7 @@ ruleTester.run("one-var", rule, {
         },
         {
             code: "function foo() { let a = 1; let b = 2; }",
+            output: "function foo() { let a = 1, b = 2; }",
             parserOptions: { ecmaVersion: 6 },
             options: ["always"],
             errors: [{
@@ -357,6 +368,7 @@ ruleTester.run("one-var", rule, {
         },
         {
             code: "function foo() { const a = 1; const b = 2; }",
+            output: "function foo() { const a = 1, b = 2; }",
             parserOptions: { ecmaVersion: 6 },
             options: ["always"],
             errors: [{
@@ -366,6 +378,7 @@ ruleTester.run("one-var", rule, {
         },
         {
             code: "function foo() { let a = 1; let b = 2; }",
+            output: "function foo() { let a = 1, b = 2; }",
             parserOptions: { ecmaVersion: 6 },
             options: [{ let: "always" }],
             errors: [{
@@ -375,6 +388,7 @@ ruleTester.run("one-var", rule, {
         },
         {
             code: "function foo() { const a = 1; const b = 2; }",
+            output: "function foo() { const a = 1, b = 2; }",
             parserOptions: { ecmaVersion: 6 },
             options: [{ const: "always" }],
             errors: [{
@@ -384,6 +398,7 @@ ruleTester.run("one-var", rule, {
         },
         {
             code: "function foo() { let a = 1, b = 2; }",
+            output: "function foo() { let a = 1; let b = 2; }",
             parserOptions: { ecmaVersion: 6 },
             options: [{ let: "never" }],
             errors: [{
@@ -393,6 +408,7 @@ ruleTester.run("one-var", rule, {
         },
         {
             code: "function foo() { let a = 1, b = 2; }",
+            output: "function foo() { let a = 1; let b = 2; }",
             parserOptions: { ecmaVersion: 6 },
             options: [{ initialized: "never" }],
             errors: [{
@@ -402,6 +418,7 @@ ruleTester.run("one-var", rule, {
         },
         {
             code: "function foo() { let a, b; }",
+            output: "function foo() { let a; let b; }",
             parserOptions: { ecmaVersion: 6 },
             options: [{ uninitialized: "never" }],
             errors: [{
@@ -411,6 +428,7 @@ ruleTester.run("one-var", rule, {
         },
         {
             code: "function foo() { const a = 1, b = 2; }",
+            output: "function foo() { const a = 1; const b = 2; }",
             parserOptions: { ecmaVersion: 6 },
             options: [{ initialized: "never" }],
             errors: [{
@@ -420,6 +438,7 @@ ruleTester.run("one-var", rule, {
         },
         {
             code: "function foo() { const a = 1, b = 2; }",
+            output: "function foo() { const a = 1; const b = 2; }",
             parserOptions: { ecmaVersion: 6 },
             options: [{ const: "never" }],
             errors: [{
@@ -429,6 +448,7 @@ ruleTester.run("one-var", rule, {
         },
         {
             code: "let foo = true; switch(foo) { case true: let bar = 2; break; case false: let baz = 3; break; }",
+            output: null,
             parserOptions: { ecmaVersion: 6 },
             options: [{ var: "always", let: "always", const: "never" }],
             errors: [{
@@ -440,6 +460,7 @@ ruleTester.run("one-var", rule, {
         },
         {
             code: "var one = 1, two = 2;\nvar three;",
+            output: "var one = 1, two = 2,\nthree;",
             options: ["always"],
             errors: [{
                 message: "Combine this with the previous 'var' statement.",
@@ -450,6 +471,7 @@ ruleTester.run("one-var", rule, {
         },
         {
             code: "var i = [0], j;",
+            output: "var i = [0]; var j;",
             options: [{ initialized: "never" }],
             errors: [{
                 message: "Split initialized 'var' declarations into multiple statements.",
@@ -458,6 +480,7 @@ ruleTester.run("one-var", rule, {
         },
         {
             code: "var i = [0], j;",
+            output: "var i = [0]; var j;",
             options: [{ uninitialized: "never" }],
             errors: [{
                 message: "Split uninitialized 'var' declarations into multiple statements.",
@@ -466,6 +489,7 @@ ruleTester.run("one-var", rule, {
         },
         {
             code: "for (var x of foo) {}; for (var y of foo) {}",
+            output: null,
             options: ["always"],
             parserOptions: { ecmaVersion: 6 },
             errors: [{
@@ -475,6 +499,7 @@ ruleTester.run("one-var", rule, {
         },
         {
             code: "for (var x in foo) {}; for (var y in foo) {}",
+            output: null,
             options: ["always"],
             parserOptions: { ecmaVersion: 6 },
             errors: [{
@@ -484,6 +509,7 @@ ruleTester.run("one-var", rule, {
         },
         {
             code: "var foo = function() { var bar = true; var baz = false; }",
+            output: "var foo = function() { var bar = true, baz = false; }",
             errors: [{
                 message: "Combine this with the previous 'var' statement.",
                 type: "VariableDeclaration",
@@ -493,6 +519,7 @@ ruleTester.run("one-var", rule, {
         },
         {
             code: "function foo() { var bar = true; if (qux) { var baz = false; } else { var quxx = 42; } }",
+            output: null,
             errors: [{
                 message: "Combine this with the previous 'var' statement.",
                 type: "VariableDeclaration",
@@ -507,6 +534,7 @@ ruleTester.run("one-var", rule, {
         },
         {
             code: "var foo = () => { var bar = true; var baz = false; }",
+            output: "var foo = () => { var bar = true, baz = false; }",
             parserOptions: { ecmaVersion: 6 },
             errors: [{
                 message: "Combine this with the previous 'var' statement.",
@@ -517,6 +545,7 @@ ruleTester.run("one-var", rule, {
         },
         {
             code: "var foo = function() { var bar = true; if (qux) { var baz = false; } }",
+            output: null,
             errors: [{
                 message: "Combine this with the previous 'var' statement.",
                 type: "VariableDeclaration",
@@ -526,6 +555,7 @@ ruleTester.run("one-var", rule, {
         },
         {
             code: "var foo; var bar;",
+            output: "var foo, bar;",
             errors: [{
                 message: "Combine this with the previous 'var' statement.",
                 type: "VariableDeclaration",
@@ -535,6 +565,7 @@ ruleTester.run("one-var", rule, {
         },
         {
             code: "var x = 1, y = 2; for (var z in foo) {}",
+            output: "var x = 1; var y = 2; for (var z in foo) {}",
             parserOptions: { ecmaVersion: 6 },
             options: [{ initialized: "never", uninitialized: "always" }],
             errors: [{
@@ -546,6 +577,7 @@ ruleTester.run("one-var", rule, {
         },
         {
             code: "var x = 1, y = 2; for (var z of foo) {}",
+            output: "var x = 1; var y = 2; for (var z of foo) {}",
             parserOptions: { ecmaVersion: 6 },
             options: [{ initialized: "never", uninitialized: "always" }],
             errors: [{
@@ -557,6 +589,7 @@ ruleTester.run("one-var", rule, {
         },
         {
             code: "var x; var y; for (var z in foo) {}",
+            output: "var x, y; for (var z in foo) {}",
             parserOptions: { ecmaVersion: 6 },
             options: [{ initialized: "never", uninitialized: "always" }],
             errors: [{
@@ -568,6 +601,7 @@ ruleTester.run("one-var", rule, {
         },
         {
             code: "var x; var y; for (var z of foo) {}",
+            output: "var x, y; for (var z of foo) {}",
             parserOptions: { ecmaVersion: 6 },
             options: [{ initialized: "never", uninitialized: "always" }],
             errors: [{
@@ -579,6 +613,7 @@ ruleTester.run("one-var", rule, {
         },
         {
             code: "var x; for (var y in foo) {var bar = y; var a; for (var z of bar) {}}",
+            output: "var x; for (var y in foo) {var bar = y, a; for (var z of bar) {}}",
             parserOptions: { ecmaVersion: 6 },
             options: [{ initialized: "never", uninitialized: "always" }],
             errors: [{
@@ -590,6 +625,7 @@ ruleTester.run("one-var", rule, {
         },
         {
             code: "var a = 1; var b = 2; var x, y; for (var z of foo) {var c = 3, baz = z; for (var d in baz) {}}",
+            output: "var a = 1; var b = 2; var x, y; for (var z of foo) {var c = 3; var baz = z; for (var d in baz) {}}",
             parserOptions: { ecmaVersion: 6 },
             options: [{ initialized: "never", uninitialized: "always" }],
             errors: [{
