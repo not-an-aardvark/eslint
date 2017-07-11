@@ -17,17 +17,15 @@ const ERROR = { message: "Using 'else' is unnecessary here.", type: "Keyword" };
 // Tests
 //------------------------------------------------------------------------------
 
-const ruleTester = new RuleTester();
+const ruleTester = new RuleTester({ parserOptions: { ecmaFeatures: { globalReturn: true } } });
 
 ruleTester.run("no-useless-else", rule, {
     valid: [
         "function foo() { if (true) { if (false) { return x; } } else { return y; } }",
         "function foo() { if (true) { return x; } return y; }",
-        "function foo() { if (true) { for (;;) { return x; } } else { return y; } }",
-        "function foo() { var x = true; if (x) { return x; } else if (x === false) { return false; } }",
+        "function foo() { if (true) { for (;foo;) { return x; } } else { return y; } }",
         "function foo() { if (true) notAReturn(); else return y; }",
-        "function foo() {if (x) { notAReturn(); } else if (y) { return true; } else { notAReturn(); } }",
-        "function foo() {if (x) { return true; } else if (y) { notAReturn() } else { notAReturn(); } }",
+        "function foo() { if (x) { notAReturn(); } else if (y) { return true; } else { notAReturn(); } }",
         "if (0) { if (0) {} else {} } else {}"
     ],
     invalid: [
@@ -80,7 +78,7 @@ ruleTester.run("no-useless-else", rule, {
         {
             code: "function foo9() {if (x) { return true; } else if (y) { return true; } else { notAReturn(); } }",
             output: "function foo9() {if (x) { return true; } else if (y) { return true; }  notAReturn();  }",
-            errors: [ERROR]
+            errors: [ERROR, ERROR]
         },
         {
             code: "function foo10() { if (foo) return bar; else (foo).bar(); }",
@@ -160,6 +158,26 @@ ruleTester.run("no-useless-else", rule, {
                     }
                 }
             `,
+            errors: [ERROR, ERROR, ERROR, ERROR]
+        },
+        {
+            code: "function foop() { if (x) { return x; } else if (y) { return false; } }",
+            output: "function foop() { if (x) { return x; } if (y) { return false; } }",
+            errors: [ERROR]
+        },
+        {
+            code: "if (x) { return true; } else if (y) notAReturn(); else notAReturn();",
+            output: "if (x) { return true; } if (y) notAReturn(); else notAReturn();",
+            errors: [ERROR]
+        },
+        {
+            code: "if (xp) return true; else if (y) notAReturn(); else notAReturn();",
+            output: "if (xp) return true; if (y) notAReturn(); else notAReturn();",
+            errors: [ERROR]
+        },
+        {
+            code: "if (foo) { for(;;) return; } else bar();",
+            output: "if (foo) { for(;;) return; } bar();",
             errors: [ERROR]
         }
     ]
